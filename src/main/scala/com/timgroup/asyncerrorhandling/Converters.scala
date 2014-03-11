@@ -2,6 +2,7 @@ package com.timgroup.asyncerrorhandling
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
+import scala.language.implicitConversions
 import scala.util.control.NoStackTrace
 import scala.util.Failure
 import scala.util.Success
