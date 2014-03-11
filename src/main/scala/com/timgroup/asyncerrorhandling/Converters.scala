@@ -83,4 +83,22 @@ trait OrConverters {
 
 object OrConverters extends OrConverters
 
-object Converters extends OrConverters with TryConverters with FutureConverters
+trait FunctionConverters {
+  implicit def orFunctionToSemanticErrorFutureFunction[A, B, C](f: A => B Or C): A => Future[B] = {
+    import OrConverters.OrFutureConverter
+    f(_).toSemanticErrorFuture
+  }
+
+  implicit def eitherFunctionToSemanticErrorFutureFunction[A, L, R](f: A => Either[L, R]): A => Future[R] = {
+    import EitherConverters.EitherFutureConverter
+    f(_).toSemanticErrorFuture
+  }
+
+  implicit def tryFunctionToFutureFunction[A, B](f: A => Try[B]): A => Future[B] = {
+    import TryConverters.TryFutureConverter
+    f(_).toFuture
+  }
+}
+object FunctionConverters extends FunctionConverters
+
+object Converters extends OrConverters with TryConverters with FutureConverters with FunctionConverters
