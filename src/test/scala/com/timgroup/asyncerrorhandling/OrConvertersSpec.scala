@@ -1,60 +1,65 @@
 package com.timgroup.asyncerrorhandling
 
-
 import org.scalatest.FunSpec
 import org.scalatest.Matchers
 import org.scalatest.concurrent.ScalaFutures
 
 import org.scalautils.Bad
 import org.scalautils.Good
+import org.scalautils.Every
+import org.scalautils.Many
 import org.scalautils.Or
 
 class OrConvertersSpec extends FunSpec with Matchers with ScalaFutures {
-  describe("Or Future converter") {
-    it("should convert a Bad into a Future with a SemanticError") {
-      val bad: Int Or String = Bad("error")
+  type ErrorMessage = String
+  val good: Int Or ErrorMessage = Good(42)
+  val bad:  Int Or ErrorMessage = Bad("error")
+  val manyBad: Int Or Every[ErrorMessage] = Bad(Many("error1", "error2"))
 
+  describe("Or to Future conversions") {
+    it("converts a Bad to a Future which is failed with a SemanticError") {
       val f = OrConverters.toFuture(bad)
       f.failed.futureValue should be (SemanticError("error"))
     }
 
-    it("should convert Good into a Future with the value") {
-      val good: Int Or String = Good(42)
+    it("converts a Bad containing multiple errors to a Future which is failed with a SemanticError") {
+      val f = OrConverters.toFuture(manyBad)
+      f.failed.futureValue should be (SemanticError(Many("error1", "error2")))
+    }
 
+    it("converts a Good to a Future which is successful with the value") {
       val f = OrConverters.toFuture(good)
       f.futureValue should be (42)
     }
 
-    it("should be able to use the implicits") {
-      val good: Int Or String = Good(42)
-
+    it("provides an implicit to enrich an Or with a conversion method to Future") {
       import OrConverters.OrFutureConverter
       val f = good.toSemanticErrorFuture
       f.futureValue should be (42)
     }
   }
 
-  describe("Or Try converter") {
-    it("should convert a Bad into a Try with a SemanticError") {
-      val bad: Int Or String = Bad("error")
-
+  describe("Or to Try conversions") {
+    it("converts a Bad to a Try which is a failure with a SemanticError") {
       val f = OrConverters.toTry(bad)
       f.failed.get should be (SemanticError("error"))
     }
 
-    it("should convert Good into a Try with the value") {
-      val good: Int Or String = Good(42)
+    it("converts a Bad containing multiple errors to a Try which is a failure with a SemanticError") {
+      val f = OrConverters.toTry(manyBad)
+      f.failed.get should be (SemanticError(Many("error1", "error2")))
+    }
 
+    it("converts a Good to a Try which is a success with the value") {
       val f = OrConverters.toTry(good)
       f.get should be (42)
     }
 
-    it("should be able to use the implicits") {
-      val good: Int Or String = Good(42)
-
+    it("provides an implicit to enrich an Or with a conversion method to Try") {
       import OrConverters.OrTryConverter
       val f = good.toSemanticErrorTry
       f.get should be (42)
     }
   }
+
 }
