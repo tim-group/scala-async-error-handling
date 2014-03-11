@@ -12,7 +12,9 @@ import org.scalautils.Bad
 import org.scalautils.Good
 import org.scalautils.Or
 
-case class SemanticError[T](value: T) extends RuntimeException() with NoStackTrace
+case class SemanticError[T](value: T) extends RuntimeException() with NoStackTrace {
+  override def toString: String = super.toString + "(" + value.toString + ")"
+}
 
 trait FutureConverters {
   implicit class FutureFlatMapConverters[A](future: Future[A]) {
