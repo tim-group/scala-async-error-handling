@@ -1,6 +1,5 @@
 package com.timgroup.asyncerrorhandling
 
-
 import org.scalatest.FunSpec
 import org.scalatest.Matchers
 import org.scalatest.concurrent.ScalaFutures
