@@ -10,7 +10,7 @@ crossScalaVersions := Seq("2.10.3")
 
 libraryDependencies <++= scalaVersion(scalaCompilerDependency(_))
 
-libraryDependencies += "org.scalautils" %% "scalautils" % "2.1.0"
+libraryDependencies += "org.scalautils" %% "scalautils" % "2.1.0" % "optional"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.1.0" % "test"
 
