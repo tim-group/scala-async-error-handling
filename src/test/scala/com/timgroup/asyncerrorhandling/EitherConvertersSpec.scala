@@ -3,9 +3,9 @@ package com.timgroup.asyncerrorhandling
 import org.scalatest.FunSpec
 import org.scalatest.Matchers
 import org.scalatest.concurrent.ScalaFutures
+import org.scalautils.ErrorMessage
 
 class EitherConvertersSpec extends FunSpec with Matchers with ScalaFutures {
-  type ErrorMessage = String
   val right: Either[ErrorMessage, Int] = Right(42)
   val left:  Either[ErrorMessage, Int] = Left("error")
 

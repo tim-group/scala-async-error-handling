@@ -6,12 +6,12 @@ import org.scalatest.concurrent.ScalaFutures
 
 import org.scalautils.Bad
 import org.scalautils.Good
+import org.scalautils.ErrorMessage
 import org.scalautils.Every
 import org.scalautils.Many
 import org.scalautils.Or
 
 class OrConvertersSpec extends FunSpec with Matchers with ScalaFutures {
-  type ErrorMessage = String
   val good: Int Or ErrorMessage = Good(42)
   val bad:  Int Or ErrorMessage = Bad("error")
   val manyBad: Int Or Every[ErrorMessage] = Bad(Many("error1", "error2"))
