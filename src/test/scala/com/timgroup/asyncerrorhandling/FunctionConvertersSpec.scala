@@ -1,74 +1,66 @@
 package com.timgroup.asyncerrorhandling
 
-
-import org.scalatest.FunSpec
-import org.scalatest.Matchers
-import org.scalatest.concurrent.ScalaFutures
-import org.scalautils.Bad
-import org.scalautils.Good
-import org.scalautils.Or
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.util.Failure
 import scala.util.Success
 
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.FunSpec
+import org.scalatest.Matchers
+import org.scalautils.Bad
+import org.scalautils.Good
+
 class FunctionConvertersSpec extends FunSpec with Matchers with ScalaFutures {
-  val future = Future.successful(-1)
 
   describe("Function1 converters") {
     import com.timgroup.asyncerrorhandling.FunctionConverters._
+    val posF = Future {  1 }
+    val negF = Future { -1 }
 
     describe("Or to Future") {
-      val plusGood = (x: Int) => {
-        if (x >= 0) Good(x) else Bad("negative")
-      }
-	  it("handles Good") {
-	    val goodF = Future { 1 }.flatMap(plusGood)
+      val nonNegativeGood = (x: Int) => if (x >= 0) Good(x) else Bad("negative")
 
-        goodF.futureValue should be (1)
+      it("handles Good") {
+        val f = posF.flatMap(nonNegativeGood)
+        f.futureValue should be (1)
       }
 
-	  it("handles Bad") {
-	    val badF = Future { -1 }.flatMap(plusGood)
-
-	    badF.failed.futureValue should be (SemanticError("negative"))
-	  }
+      it("handles Bad") {
+        val f = negF.flatMap(nonNegativeGood)
+        f.failed.futureValue should be (SemanticError("negative"))
+      }
     }
 
     describe("Either to Future") {
-      val plusRight = (x: Int) => {
-        if (x >= 0) Right(x) else Left("negative")
-      }
-	  it("handles Right") {
-	    val rightF = Future { 1 }.flatMap(plusRight)
+      val nonNegativeRight = (x: Int) => if (x >= 0) Right(x) else Left("negative")
 
-        rightF.futureValue should be (1)
+      it("handles Right") {
+        val f = posF.flatMap(nonNegativeRight)
+        f.futureValue should be (1)
       }
 
-	  it("handles Left") {
-	    val leftF = Future { -1 }.flatMap(plusRight)
-
-	    leftF.failed.futureValue should be (SemanticError("negative"))
-	  }
+      it("handles Left") {
+        val f = negF.flatMap(nonNegativeRight)
+        f.failed.futureValue should be (SemanticError("negative"))
+      }
     }
 
     describe("Try to Future") {
-      val e = new RuntimeException("negative")
-      val plusSuccess = (x: Int) => {
-        if (x >= 0) Success(x) else Failure(e)
-      }
+      val ex = new RuntimeException("negative")
+      val nonNegativeSuccess = (x: Int) => if (x >= 0) Success(x) else Failure(ex)
 
       it("handles Success") {
-        val successF = Future { 1 }.flatMap(plusSuccess)
-
-        successF.futureValue should be (1)
+        val f = posF.flatMap(nonNegativeSuccess)
+        f.futureValue should be (1)
       }
 
       it("handles Failure") {
-        val failureF = Future { -1 }.flatMap(plusSuccess)
-
-        failureF.failed.futureValue should be (e)
+        val f = negF.flatMap(nonNegativeSuccess)
+        f.failed.futureValue should be (ex)
       }
     }
+
   }
+
 }

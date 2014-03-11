@@ -99,6 +99,7 @@ trait FunctionConverters {
     f(_).toFuture
   }
 }
+
 object FunctionConverters extends FunctionConverters
 
 object Converters extends OrConverters with TryConverters with FutureConverters with FunctionConverters
