@@ -4,9 +4,9 @@ organization := "com.timgroup"
 
 version := "0.0.1"
 
-scalaVersion := "2.10.3"
+scalaVersion := "2.10.7"
 
-crossScalaVersions := Seq("2.10.3")
+crossScalaVersions := Seq("2.10.7")
 
 libraryDependencies <++= scalaVersion(scalaCompilerDependency(_))
 
